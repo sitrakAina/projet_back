@@ -1,20 +1,30 @@
 const mongoose = require('mongoose');
 
-const CuisinerSchema = mongoose.Schema({
-    
-    _id: {type:Number, required:true},
-    nom: {type: String, required: true},
-    prenom: {type: String, required: true},
-    email: {type: String, required: true},
-    password: {type: String, required: true},
-    specialite: {type: String, required: true},
-},
-{
-    timestamps: true
-}
-);
+const Schema = mongoose.Schema;
 
-module.exports = mongoose.model('Cuisiner', CuisinerSchema);
+const UserSchema = new Schema({
+    nom: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    specialite: {
+        type: String,
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+module.exports = mongoose.model('users', UserSchema);
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
