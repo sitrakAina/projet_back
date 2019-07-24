@@ -1,107 +1,57 @@
-const express = require('express');
-const router = express.Router();
-const gravatar = require('gravatar');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const passport = require('passport');
-const validateRegisterInput = require('../validation/register');
-const validateLoginInput = require('../validation/login');
+// var controllerAdmin = require('../Cotrollers/controller_admin');
+// var controllerArticle = require('../Cotrollers/controller_article');
 
-const User = require('../models/model');
+// module.exports.route = function (app) {
 
-router.post('/register', function(req, res) {
+//     app.route('/admin').get(controllerAdmin.getAdmin)
+//     app.route('/register').post(controllerAdmin.postAdmin)
+//     app.route('/register/:id').put(controllerAdmin.updateAdmin)
+//     app.route('/register/:id').delete(controllerAdmin.deleteAdmin)
+//     app.route('/login').post(controllerAdmin.postLogin)
 
-    const { errors, isValid } = validateRegisterInput(req.body);
+//     app.route('/profil').post(controllerArticle.create);
+//     app.route('/profil').get(controllerArticle.findAllArticle);
+//     app.route('/profil/:image').get(controllerArticle.findOneArticle);
+//     // app.get('/profil/:profilId', pers.findOne);
+//     // app.get('/user/:photo_profil', pers.lireImage);
+// }
 
-    if(!isValid) {
-        return res.status(400).json(errors);
-    }
-    User.findOne({
-        email: req.body.email
-    }).then(user => {
-        if(user) {
-            return res.status(400).json({
-                email: 'Email already exists'
-            });
-        }
-        else {
-            const newUser = new User({
-                nom: req.body.nom,
-                email: req.body.email,
-                password: req.body.password,
-                specialite: req.body.specialite
-            });
+module.exports = (app) => {
+
+    const controllerAdmin = require('../controllers/adminController');
+    var controllerArticle = require('../controllers/atelierController');
+    // app.get('/admin', controllerAdmin.getAdmin);
+    app.post('/register', controllerAdmin.postAdmin);
+    app.post('/login', controllerAdmin.postLogin);
+    // app.put('/register/:id', controllerAdmin.updateAdmin);
+    // app.delete('/register/:id', controllerAdmin.deleteAdmin); 
+
+    app.post('/atelier', controllerArticle.postAtelier);
+    app.get('/atelier', controllerArticle.findAllAtelier);
+    app.get('/sary/:photo', controllerArticle.lireImage); 
+}
+
+ /*     app.route('/update/:id')
+            .put(notes.updateDonnee)
+        app.route('/delete/:id')
+            .delete(notes.deleteDonnee)
+    
+        app.route('/image/:im')
+            .get(notes.image)
+    
+    
+        app.route('/article')
+            .post(notes.postArticle)
+        .get(notes.getArt)
+    
+        app.route('/comment')
+            .put(notes.commentaire)
+    
+        app.route('/login')
+            .post(notes.postLogin)
             
-            bcrypt.genSalt(10, (err, salt) => {
-                if(err) console.error('There was an error', err);
-                else {
-                    bcrypt.hash(newUser.password, salt, (err, hash) => {
-                        if(err) console.error('There was an error', err);
-                        else {
-                            newUser.password = hash;
-                            newUser
-                                .save()
-                                .then(user => {
-                                    res.json(user)
-                                }); 
-                        }
-                    });
-                }
-            });
-        }
-    });
-});
-
-router.post('/login', (req, res) => {
-
-    const { errors, isValid } = validateLoginInput(req.body);
-
-    if(!isValid) {
-        return res.status(400).json(errors);
-    }
-
-    const email = req.body.email;
-    const password = req.body.password;
-
-    User.findOne({email})
-        .then(user => {
-            if(!user) {
-                errors.email = 'User not found'
-                return res.status(404).json(errors);
-            }
-            bcrypt.compare(password, user.password)
-                    .then(isMatch => {
-                        if(isMatch) {
-                            const payload = {
-                                id: user.id,
-                                name: user.nom
-                            }
-                            jwt.sign(payload, 'secret', {
-                                expiresIn: 3600
-                            }, (err, token) => {
-                                if(err) console.error('There is some error in token', err);
-                                else {
-                                    res.json({
-                                        success: true,
-                                        token: `Bearer ${token}`
-                                    });
-                                }
-                            });
-                        }
-                        else {
-                            errors.password = 'Incorrect Password';
-                            return res.status(400).json(errors);
-                        }
-                    });
-        });
-});
-
-router.get('/me', passport.authenticate('jwt', { session: false }), (req, res) => {
-    return res.json({
-        id: req.user.id,
-        nom: req.user.nom,
-        email: req.user.email
-    });
-});
-
-module.exports = router;
+        app.route('/')
+            .get(notes.getDonne)
+            .post(notes.postDonne)
+      app.route('/')
+      .get(notes.getDonne) */
